@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rigveda Mantras</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding-top: 20px;
+        }
+        .book {
+            width: 80%;
+            max-width: 900px;
+            background: #e0cda9;
+            border: 2px solid #8b5a2b;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .page {
+            padding: 20px;
+            background: #f5deb3;
+            border: 1px solid #8b5a2b;
+            border-radius: 10px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+            display: block;
+        }
+        .controls {
+            text-align: center;
+            padding: 10px;
+            background: #8b5a2b;
+            color: white;
+            border-radius: 0 0 10px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .controls button {
+            background: #d2b48c;
+            color: #8b5a2b;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .controls button:hover {
+            background: #c19a6b;
+        }
+        .page-indicator {
+            font-size: 16px;
+        }
+        .mantra {
+            text-align: center;
+            font-size: 18px;
+            color: red;
+            font-weight: bold;
+        }
+        .mantra.active {
+            display: block;
+        }
+        .details {
+            overflow-y: scroll;
+            height: 300px;
+        }
+        .dropdown {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="book">
+        <div class="dropdown">
+            <label for="lang_opt">Language:</label>
+            <select id="lang_opt" onchange="handleLangChange(this.value)">
+                <option value="Eng">English</option>
+                <option value="Hin">Hindi</option>
+            </select>
+        </div>
+        <div id="show"></div>
+        <div class="controls">
+            <button onclick="prevPage()">Previous</button>
+            <span class="page-indicator">Page <span id="currentPage">1</span> of <span id="totalPages">1</span></span>
+            <input type="number" id="pageInput" min="1" value="1" onchange="goToPage(this.value)">
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const totalPages = 10552;
+            let currentPage = localStorage.getItem('currentPage') ? parseInt(localStorage.getItem('currentPage')) : 1;
+            let lang = localStorage.getItem('Lang') ? localStorage.getItem('Lang') : 'Hin';
+            document.getElementById('totalPages').textContent = totalPages;
+            document.getElementById('pageInput').max = totalPages;
+            document.getElementById('lang_opt').value = lang;
+
+
+            function showPage(page_no) {
+                page = `Mantra_${lang}_${page_no}.html`;
+                fetch(page)
+                    .then(response => response.text())
+                    .then(data => {
+                        document.getElementById('show').innerHTML = data;
+                    })
+                    .catch(error => console.error('Error loading page:', error));
+                document.getElementById('currentPage').textContent = page_no;
+                document.getElementById('pageInput').value = page_no;
+                localStorage.setItem('currentPage', page_no);
+            }
+
+            window.nextPage = function() {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    showPage(currentPage);
+                }
+            }
+
+            window.prevPage = function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    showPage(currentPage);
+                }
+            }
+
+            window.goToPage = function(page_no) {
+                if (page_no >= 1 && page_no <= totalPages) {
+                    currentPage = parseInt(page_no);
+                    showPage(currentPage);
+                }
+            }
+
+            window.handleLangChange = function(value) {
+                localStorage.setItem('Lang', value);
+                lang = value
+                showPage(currentPage)
+            }
+
+            showPage(currentPage);
+        });
+    </script>
+</body>
+</html>
